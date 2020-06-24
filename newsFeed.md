@@ -111,30 +111,30 @@
 ### Schema design
 #### User table
 
-| Columns  | Type    | 
-|----------|---------| 
-| id       | Integer | 
-| username | varchar | 
-| email    | varchar | 
-| password | varchar | 
+| Columns  | Type    |
+|----------|---------|
+| id       | Integer |
+| username | varchar |
+| email    | varchar |
+| password | varchar |
 
 #### Friendship table
 * Select * from friendship_table where from_user_id = user_id
 
-| Columns      | Type        | 
-|--------------|-------------| 
-| id           | Integer     | 
-| from_user_id | foreign key | 
-| to_user_id   | foreign key | 
+| Columns      | Type        |
+|--------------|-------------|
+| id           | Integer     |
+| from_user_id | foreign key |
+| to_user_id   | foreign key |
 
 #### Tweet table
 
-| Columns    | Type        | 
-|------------|-------------| 
-| id         | Integer     | 
-| user_id    | foreign_key | 
-| content    | text        | 
-| created_at | timestamp   | 
+| Columns    | Type        |
+|------------|-------------|
+| id         | Integer     |
+| user_id    | foreign_key |
+| content    | text        |
+| created_at | timestamp   |
 
 ## Initial solution
 ### Pull-based
@@ -192,12 +192,12 @@ getNewsFeed(request)
 	- Everyone's newsfeed info is stored in the same newsFeed table.
 	- Select * from newsFeed Table where owner_id = XX orderBy createdAt desc limit 20;
 
-| Column    | Type        | 
-|-----------|-------------| 
-| id        | integer     | 
-| ownerId   | foreign key | 
-| tweetId   | foreign key | 
-| createdAt | timestamp   | 
+| Column    | Type        |
+|-----------|-------------|
+| id        | integer     |
+| ownerId   | foreign key |
+| tweetId   | foreign key |
+| createdAt | timestamp   |
 
 #### Post tweet 
 ##### Steps
@@ -255,6 +255,7 @@ getNewsFeed(request)
 	    + For users with newsfeed cache: Merge N followers' tweets after a specific timestamp. And then merge with the cache. 
 
 #### Scale push
+
 * Push-based approach stores news feed in disk, much better than the optimized pull approach.
 * For inactive users, do not push
 	- Rank followers by weight (for example, last login time)
@@ -304,24 +305,24 @@ getNewsFeed(request)
 
 * Tweet table
 
-| Columns     | Type        | 
-|-------------|-------------| 
-| id          | integer     | 
-| userId      | foreign key | 
-| content     | text        | 
-| createdAt   | timestamp   | 
-| likeNums    | integer     | 
-| commentNums | integer     | 
-| retweetNums | integer     | 
+| Columns     | Type        |
+|-------------|-------------|
+| id          | integer     |
+| userId      | foreign key |
+| content     | text        |
+| createdAt   | timestamp   |
+| likeNums    | integer     |
+| commentNums | integer     |
+| retweetNums | integer     |
 
 * Like table
 
-| Columns   | Type       | 
-|-----------|------------| 
-| id        | integer    | 
-| userId    | foreignKey | 
-| tweetId   | foreignKey | 
-| createdAt | timestamp  | 
+| Columns   | Type       |
+|-----------|------------|
+| id        | integer    |
+| userId    | foreignKey |
+| tweetId   | foreignKey |
+| createdAt | timestamp  |
 
 ### Denormalize
 * Select Count in Like Table where tweet id == 1

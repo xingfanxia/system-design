@@ -40,24 +40,26 @@
 	- Like operation is expensive. It is a range query. 
 	- where keyword like 'abc%' is equivalent to where keyword >= 'abc' AND keyword < 'abd'
 
-| keyword | hitCount | 
-|---------|----------| 
-| Amazon  | 20b      | 
-| Apple   | 15b      | 
-| Adidas  | 7b       | 
-| Airbnb  | 3b       | 
+| keyword | hitCount |
+|---------|----------|
+| Amazon  | 20b      |
+| Apple   | 15b      |
+| Adidas  | 7b       |
+| Airbnb  | 3b       |
 
 #### Prefix table
+
 * Convert a keyword table to a prefix table, put into memory
 
-| prefix | keywords                     | 
-|--------|------------------------------| 
-| a      | "amazon","apple"             | 
-| am     | "amazon","amc"               | 
-| ad     | "adidas","adobe"             | 
-| don    | "don't have", "donald trump" | 
+| prefix | keywords                     |
+|--------|------------------------------|
+| a      | "amazon","apple"             |
+| am     | "amazon","amc"               |
+| ad     | "adidas","adobe"             |
+| don    | "don't have", "donald trump" |
 
 ### Trie
+
 * Trie ( in memory ) + Serialized Trie ( on disk ). 
 	- Trie is must faster than DB because
 		+ All in-memory vs DB cache miss
@@ -66,12 +68,12 @@
 	- e.g. TopK. Always need to traverse the entire trie. Exponential complexity.
 * Instead, we can store the top n hot key words and their frequencies at each node, search becomes O(len).
 
-| prefix | keywords                     | 
-|--------|------------------------------| 
-| a      | "amazon","apple"             | 
-| am     | "amazon","amc"               | 
-| ad     | "adidas","adobe"             | 
-| don    | "don't have", "donald trump" | 
+| prefix | keywords                     |
+|--------|------------------------------|
+| a      | "amazon","apple"             |
+| am     | "amazon","amc"               |
+| ad     | "adidas","adobe"             |
+| don    | "don't have", "donald trump" |
 
 * How do we add a new record {abd: 3b} to the trie
 	- Insert the record into all nodes along its path in the trie.

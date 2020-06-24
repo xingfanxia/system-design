@@ -142,15 +142,18 @@
 ![messenger notifications](./images/messenger_notifications.jpeg)
 
 ##### Online notification
+
 * User online: Push message via long poll connection
 	- How does long poll find user's connection among so many long polls? There will be a user sign-in process
 		1. A TCP connection is set after three time hand shake. 
 		2. Client sends a request based on the connection. 
 		3. Server interprets the connection. If valid, it will save the mapping between uid and tcp connection socket descriptor. 
-		4. This descriptor will be saved on local cache or distributed cache. 
+		4. This descriptor will be saved on local cache or distributed cache. ****
 
 ##### History
+
 ###### Pull model (Periodical short pull)
+
 * User periodically ask for new messages from server
 * Use case:
 	- Used on reconnection
@@ -169,6 +172,7 @@
 		+ Long pull will return if not getting a response after a long time. There will still be many waste of connections. 
 
 ##### Push model (WebSocket)
+
 ###### Websocket
 * Websocket: Client and server need one-time handshake for bi-directional data transfer. When server side has a new notification, it could push to the client via the websocket connection. 
 	- Websocket is a duplex protocol based on a single TCP connection. 
@@ -176,7 +180,8 @@
 		- Support bidirectional communication, client no longer needs to pull periodically. 
 		- Reduce the setup time. A new TCP connection does not need to be established. 
 		- Support natively by the web after HTML5 appears.
-	- TODO: HOW DOES WEBSOCKET WORK INTERNALLy
+	- TODO: HOW DOES WEBSOCKET WORK Internally
+	  - https://sookocheff.com/post/networking/how-do-websockets-work/
 * Many other protocols based on TCP long connection such as XMPP/MQTT. 
 	- XMPP is mature and easy to extend. But the XML based transfer schema consumes a lot of network bandwidth and has a complicated design.
 	- MQTT is based on pub/sub mode, reserve network bandwidth, easy to extend. But it is not a protocol for IM so does not support many IM features such as group chatting, offline messages. 
@@ -240,6 +245,7 @@
 
 ## Storage
 ### One-on-One chat schema
+
 #### Requirements
 * Load all recent conversations according to the last updated timestamp
 * For each conversation, load all messages within that conversation according to the message create timestamp
@@ -248,13 +254,13 @@
 * The message table is as follows:
 	- Create timestamp could be used to load all conversations after certain date
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId | integer   |  1001   | 
-| from_user_id  | integer   | sender  | 
-| to_user_id  | integer   | receiver  | 
-| content  | string   | hello world | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId | integer   |  1001   |
+| from_user_id  | integer   | sender  |
+| to_user_id  | integer   | receiver  |
+| content  | string   | hello world |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * Cons: 
 	- Determine the thread_list to be displayed
@@ -281,19 +287,19 @@ order by create_at desc
 	- Create a message_content table and message_index table
 * message_content
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId | integer   |  1001   | 
-| content  | string   | hello world | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId | integer   |  1001   |
+| content  | string   | hello world |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * message_index
 	- ??? What are the reason isInbox is needed
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId  | string   | 1029 | 
-| from_user_id | integer   |  sender   | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId  | string   | 1029 |
+| from_user_id | integer   |  sender   |
 | to_user_id  | integer   | receiver  |
 | isInbox  | integer   | 1 (inbox) / 0 (sendbox)  |
 
@@ -307,10 +313,10 @@ order by create_at desc
 
 * recent_contacts
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId  | string   | 1029 | 
-| from_user_id | integer   |  sender   | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId  | string   | 1029 |
+| from_user_id | integer   |  sender   |
 | to_user_id  | integer   | receiver  |
 
 ### Group chat schema
@@ -326,24 +332,24 @@ order by create_at desc
 
 * Message table
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId | integer   |  1001   | 
-| thread_id  | integer   | createUserId + timestamp  | 
-| user_id  | integer   | sender  | 
-| content  | string   | 2019-07-15 12:00:00 | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId | integer   |  1001   |
+| thread_id  | integer   | createUserId + timestamp  |
+| user_id  | integer   | sender  |
+| content  | string   | 2019-07-15 12:00:00 |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * Thread table
 	- update_at could be used to sort all threads. 
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| thread_id | integer   |  createUserId + timestamp   | 
-| participants_ids  | text   | conversation id  | 
-| participantsHash | string    | avoid duplicates threads | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
-| update_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| thread_id | integer   |  createUserId + timestamp   |
+| participants_ids  | text   | conversation id  |
+| participantsHash | string    | avoid duplicates threads |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
+| update_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * Queries
 
@@ -372,18 +378,19 @@ order by update_at desc
 	- There is no place to store information such as the user mutes the thread. 
 
 #### Optimization: User could customize properties on chat thread
+
 * Intuition:
 	- User could mute a chat thread. Create a customized name for a group chat. 
 	- Expand the thread table with three additional fields including owner_id, ismuted, nickname
 * Message table
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| messageId | integer   |  1001   | 
-| thread_id  | integer   | createUserId + timestamp | 
-| user_id  | integer   | sender  | 
-| content  | string   | 2019-07-15 12:00:00 | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| messageId | integer   |  1001   |
+| thread_id  | integer   | createUserId + timestamp |
+| user_id  | integer   | sender  |
+| content  | string   | 2019-07-15 12:00:00 |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * Thread table
 	- update_at could be used to sort all threads. 
@@ -393,16 +400,16 @@ order by update_at desc
 	    + Participants hash: Find whether a certain group of persons already has a chat group
 	    + Updated time: Order chats by update time
 
-| Columns   | Type      | Example          | 
-|-----------|-----------|------------------| 
-| **owner_id** | integer   |  1001   | 
-| thread_id  | integer   | createUserId + timestamp | 
-| participants_ids  | json   | conversation id  | 
-| participantsHash | string  | avoid duplicates threads | 
-| **ismuted**  | bool   | personal setting  | 
-| **nickname**  | text   | conversation id  | 
-| create_at  | timestamp   | 2019-07-15 12:00:00 | 
-| update_at  | timestamp   | 2019-07-15 12:00:00 | 
+| Columns   | Type      | Example          |
+|-----------|-----------|------------------|
+| **owner_id** | integer   |  1001   |
+| thread_id  | integer   | createUserId + timestamp |
+| participants_ids  | json   | conversation id  |
+| participantsHash | string  | avoid duplicates threads |
+| **ismuted**  | bool   | personal setting  |
+| **nickname**  | text   | conversation id  |
+| create_at  | timestamp   | 2019-07-15 12:00:00 |
+| update_at  | timestamp   | 2019-07-15 12:00:00 |
 
 * Queries
 
@@ -425,6 +432,7 @@ order by update_at desc
 #### ??? Optimization: Users who just joined could only see new messages
 
 ### SQL vs NoSQL
+
 * Message table
 	- NoSQL. Do not need to take care of sharding/replica. Just need to do some configuration. 
 * Thread table
@@ -433,6 +441,7 @@ order by update_at desc
 		+ To make the most frequent queries more efficient: Select * from thread table where user_id = XX order by updatedAt
 
 # Additional Features within business logic service
+
 ## Unread messages
 ### Separate storage
 * Total unread message and unread message against a specific person
@@ -647,11 +656,13 @@ order by update_at desc
 	- Example: Slack, Hipchat
 
 ## Slack
+
 * Slack use MySQL as backend with sharding techniques
 * [How Slack build shared channels](https://slack.engineering/how-slack-built-shared-channels-8d42c895b19f)
 * [Scaling slack](https://www.infoq.com/presentations/slack-scalability-2018/)
 
 ## Hipchat
+
 * Elastic
 	- 60 messages per second
 	- 1.2 billion documents stored
@@ -682,3 +693,11 @@ CREATE TABLE messages (
 ## MirrorFly
 * [Basic MirrorFly architecture](https://www.codementor.io/@vigneshwaranb/why-enterprise-chat-apps-isn-t-built-on-server-side-database-like-hangouts-slack-hipchat-10kqdft9xg)
 * In a group chat application, the number of messages relayed between the server and client is large, message queuing will be one of the most destructive issues. To handle the message queuing in the servers, MUC & PubSup was introduced to handle the multi-user messaging. MUC (Multi-user Chat) XMPP protocol designed for multiple users to communicate simultaneously and PubSup for senders to send messages directly to receivers.
+
+
+
+### Addtional Resources
+
+- https://zhuanlan.zhihu.com/p/78065741
+- http://www.52im.net/thread-464-1-1.html
+- https://www.jianshu.com/p/fc9cfa4b34b0

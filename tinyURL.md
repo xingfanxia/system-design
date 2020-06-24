@@ -74,8 +74,10 @@
 * Shortening: Take a url and return a much shorter url. 
 	- Ex: http://www.interviewbit.com/courses/programming/topics/time-complexity/ => http://goo.gl/GUKA8w/
 	- Gotcha: What if two people try to shorten the same URL?
+	  - depends on if we want to track user analytics
 
 #### Optional
+
 * Redirection: Take a short url and redirect to the original url. 
 	- Ex: http://goo.gl/GUKA8w => http://www.interviewbit.com/courses/programming/topics/time-complexity/
 * Custom url: Allow the users to pick custom shortened url. 
@@ -131,6 +133,7 @@
 	- Key duplication if only use 6 prefix characters
 
 ### Hash - MD5 / SHA-256 / Murmur / Jenkins
+
 * Traditional Crypto hash function: MD5 and SHA-1
 		+ Secure but slow
 * Fast hash function: Murmur and Jenkins
@@ -149,11 +152,11 @@
 	- Support URL clean
 
 
-| Problem                             | Possible solution                                                                                                                                              | 
-|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------| 
-| Not short enough (At least 4 bytes) | Only retrieve first 4-5 digit of the hash result                                                                                                               | 
-| Collision cannot be avoided         | Use long_url + timestamp as hash argument, if conflict happens, try again (timestamp changes) -> multiple attempts, highly possible conflicts when data is big | 
-| Slow                                |                                                                                                                                                                | 
+| Problem                             | Possible solution                                                                                                                                              |
+|-------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Not short enough (At least 4 bytes) | Only retrieve first 4-5 digit of the hash result                                                                                                               |
+| Collision cannot be avoided         | Use long_url + timestamp as hash argument, if conflict happens, try again (timestamp changes) -> multiple attempts, highly possible conflicts when data is big |
+| Slow                                |                                                                                                                                                                |
 
 ### Encoding - Base10 / Base62 / Base64
 * Retention period varies with base radix. For example, assume 500M new records per month
@@ -161,8 +164,8 @@
 	- If length == 7, 62^7 ~ 3 trillion ~ 600 years
 	- If length == 6, 62^6 ~ 57 B ~ 10 years
 
-| Encoding           | Base10     | Base62      | Base64 | 
-|--------------------|------------|-------------|--------| 
+| Encoding           | Base10     | Base62      | Base64 |
+|--------------------|------------|-------------|--------|
 | Year               | 36,500,000 | 36,500,000  |        |
 | Usable characters  | [0-9]      | [0-9a-zA-Z] | [0-9a-zA-Z+/=]       |
 | Encoding length    | 8          | 5           |        |
@@ -177,11 +180,12 @@
 * Cons:
 	- Too long, reversable if directly apply base62 to URL
 
-
 ### Escape invalid characters
-* For example, Base64 = 
+
+* For example, Base64 =
 
 ## Architecture
+
 * ShortUrl => API Gateway => TinyUrl Service => Database => TinyUrlService => API Gateway => 301 redirect => Original Url
 * API Gateway: Can be REST API or GraphQL
 
@@ -192,6 +196,7 @@
 * 301: permanent redirect
 
 #### Error codes
+
 * 400: bad request
 * 402 / 403: forbidden or unauthorized
 * 413: payload too large
@@ -237,6 +242,7 @@ data:
 ```
 
 ### Database layer
+
 #### Database schema
 
 ```
@@ -299,14 +305,15 @@ public string longToShort(string url)
 		3. Redis -> LPush and LPop: Redis list data structure is actually queue and it is thread-safe and production ready
 
 #### Solution 2: id => shorturl mapping
+
 ##### Initial 
 * Use relational database incremental id to avoid duplication
 	+ Relies on a single node to generate UUID. Single point of failure and performance is low.
 
 ##### Database trigger - instagram distributed unique id ???
 
+## Service
 
-## Service 
 ```java
 class TinyURL
 {
@@ -469,6 +476,7 @@ return originalUrl;
 ```
 
 ##### Sharding with multiple MySQL instances
+
 * Vertical sharing
 	- Only one table
 	- Even with Custom URL, two tables in total
@@ -486,10 +494,12 @@ return originalUrl;
 		+ First know which websites are more popular in which region. Put all websites popular in US in US DB.
 
 ##### How to get global unique ID?
+
 * Zookeeper
 * Use a specialized database for managing IDs
 
 ## Follow-up
+
 ### Deal with expired records
 * Solution1: Check data in the service level, if expired, return null
 	- Pros: Simple and keep historical recordds
@@ -524,6 +534,7 @@ while(true)
 	- Solution2: Add memory buffer in the Kafka producer and batch send to Kafka broker
 
 #### Stream processing
+
 * 
 
 
